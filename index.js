@@ -51,4 +51,15 @@ app.put('/item/:id/like', (req, res) => {
     })
 })
 
-app.listen(port, () => console.log('Server running...'))
+const kill = async () => {
+    await mongoose.connection.close()
+    console.log('MongoDB Disconnected')
+    await server.close()
+    console.log('Server closed')
+    process.exit(0)
+}
+
+process.on('SIGINT', kill)
+process.on('exit', kill)
+
+const server = app.listen(port, () => console.log('Server running...'))
