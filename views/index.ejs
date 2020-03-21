@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="/style.css">
+        <title>Corona Grocery List</title>
+    </head>
+    <body>
+        <h1>The Official Corona Grocery List</h1>
+        <h3>You type, we do nothing™</h3>
+        <form method="post" action="/item/add">
+            <label for="name">Item:</label>
+            <input type="text" name="name">
+            <input type="submit" value="Add">
+        </form>
+        <ul>
+            <% items.forEach(item => { %>
+                <li>
+                    <%= item.name %> <br />
+                    <div id="<%= item._id %>">
+                        <button onclick="put(this.parentNode.id)">Like</button>
+                        <span><%= item.likes %></span>
+                    </div>
+                </li>
+            <% }); %>
+        </ul>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+        <script>
+            if (!Cookies.get('cookies') && !confirm('By clicking yes, you agree to have this website store cookies. We only use two: one to keep track of what you\'ve liked and one to see if you enabled cookies. It\'s just that simple!')) {
+                const h = document.createElement('body');
+                h.appendChild(document.createTextNode('You have to enable cookies to use this website.'));
+                document.body = h;
+            } else {
+                Cookies.set('cookies', '1');
+                function get() {
+                    return JSON.parse(LZString.decompressFromBase64(Cookies.get('liked')));
+                }
+                function format(val) {
+                    return LZString.compressToBase64(JSON.stringify(val));
+                }
+                if (!Cookies.get('liked')) Cookies.set('liked', format([]))
+                function put(id) {
+                    if (!<%= signedin %>) {
+                        alert('You\'re not signed in!')
+                        return
+                    }
+                    if (!get().includes(id)) {
+                        fetch(`./item/${id}/like`, {
+                            method: 'PUT'
+                        }).then(() => {
+                            fetch(`./item/${id}/like`)
+                                .then(res => res.json())
+                                .then(json => {
+                                    document.getElementById(id).children[1].textContent = json
+                                    Cookies.set('liked', format(get().concat([id])))
+                                })
+                                .catch(err => console.log(err))
+                        })
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
