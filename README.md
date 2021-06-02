@@ -9,7 +9,7 @@ You need to have [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing
 ### Install
 Create a .env file with a specified PORT and MONGODB_URI.
 ```
-git clone https://github.com/GeometricStoat/coronalist
+git clone https://github.com/oirope/coronalist
 npm install
 npm start
 ```
